@@ -1,0 +1,409 @@
+<!doctype html> <!-- Minimal Mistakes Jekyll Theme 4.16.4 by Michael Rose Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes Free for personal and commercial use under the MIT license https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE --> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/previews/PR1181/libs/highlight/github.min.css"> <link rel=stylesheet  href="/previews/PR1181/css/franklin.css"> <link rel=stylesheet  href="/previews/PR1181/css/minimal-mistakes.css"> <link rel=stylesheet  href="/previews/PR1181/css/makie.css"> <link rel=icon  href="/previews/PR1181/assets/icon_transparent.png"> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel=stylesheet  type="text/css"/> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel=stylesheet  type="text/css"/> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel=stylesheet  type="text/css"/> <!--[if IE ]> <style> /* old IE unsupported flexbox fixes */ .greedy-nav .site-title { padding-right: 3em; } .greedy-nav button { position: absolute; top: 0; right: 0; height: 100%; } </style> <![endif]--> <title>Layout Tutorial</title> <body class=layout--single > <div class=masthead > <div class=masthead__inner-wrap > <div class=masthead__menu > <nav id=site-nav  class=greedy-nav > <a class=title-icon  href="/previews/PR1181/"><img src="/previews/PR1181/assets/makie_logo_transparent.svg"/></a> <ul class=visible-links > <li class=masthead__menu-item > <a href="https://github.com/JuliaPlots/Makie.jl"><img src="/previews/PR1181/assets/GitHub-Mark-64px.png" class=masthead-icon  /></a> <li class=masthead__menu-item ><a href="/previews/PR1181/examples/">Examples</a> <li class=masthead__menu-item ><a href="/previews/PR1181/tutorials/">Tutorials</a> <li class=masthead__menu-item ><a href="/previews/PR1181/documentation/">Documentation</a> </ul> <button class="greedy-nav__toggle hidden" type=button > <span class=visually-hidden >Toggle menu</span> <div class=navicon ></div> </button> <ul class="hidden-links hidden"></ul> </nav> </div> </div> </div> <div class=initial-content > <div id=main  role=main > <div class=franklin-content ><h1 id=layout_tutorial ><a href="#layout_tutorial" class=header-anchor >Layout Tutorial</a></h1> <p>In this tutorial, we will see some of the capabilities of layouts in Makie while building a complex figure step by step. This is the final result we will create:</p> <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/layout_tutorial_final.png" alt=layout_tutorial_final.png  /> <details><summary>You can click here to see the full code</summary> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> CairoMakie
+
+noto_sans = assetpath(<span class=hljs-string >&quot;fonts&quot;</span>, <span class=hljs-string >&quot;NotoSans-Regular.ttf&quot;</span>)
+noto_sans_bold = assetpath(<span class=hljs-string >&quot;fonts&quot;</span>, <span class=hljs-string >&quot;NotoSans-Bold.ttf&quot;</span>)
+
+fig = Figure(backgroundcolor = RGBf0(<span class=hljs-number >0.98</span>, <span class=hljs-number >0.98</span>, <span class=hljs-number >0.98</span>),
+    resolution = (<span class=hljs-number >1000</span>, <span class=hljs-number >700</span>), font = noto_sans)
+
+ax1 = fig[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>] = Axis(fig, title = <span class=hljs-string >&quot;Pre Treatment&quot;</span>)
+
+data1 = randn(<span class=hljs-number >50</span>, <span class=hljs-number >2</span>) * [<span class=hljs-number >1</span> <span class=hljs-number >2.5</span>; <span class=hljs-number >2.5</span> <span class=hljs-number >1</span>] .+ [<span class=hljs-number >10</span> <span class=hljs-number >10</span>]
+
+line1 = lines!(ax1, <span class=hljs-number >5.</span><span class=hljs-number >.15</span>, x -&gt; x, color = :red, linewidth = <span class=hljs-number >2</span>)
+scat1 = scatter!(ax1, data1,
+    color = (:red, <span class=hljs-number >0.3</span>), markersize = <span class=hljs-number >15</span>px, marker = <span class=hljs-string >&#x27;■&#x27;</span>)
+
+ax2, line2 = lines(fig[<span class=hljs-number >1</span>, <span class=hljs-number >2</span>], <span class=hljs-number >7.</span><span class=hljs-number >.17</span>, x -&gt; -x + <span class=hljs-number >26</span>,
+    color = :blue, linewidth = <span class=hljs-number >2</span>,
+    axis = (title = <span class=hljs-string >&quot;Post Treatment&quot;</span>,))
+
+data2 = randn(<span class=hljs-number >50</span>, <span class=hljs-number >2</span>) * [<span class=hljs-number >1</span> -<span class=hljs-number >2.5</span>; -<span class=hljs-number >2.5</span> <span class=hljs-number >1</span>] .+ [<span class=hljs-number >13</span> <span class=hljs-number >13</span>]
+
+scat2 = scatter!(data2,
+    color = (:blue, <span class=hljs-number >0.3</span>), markersize = <span class=hljs-number >15</span>px, marker = <span class=hljs-string >&#x27;▲&#x27;</span>)
+
+linkaxes!(ax1, ax2)
+
+hideydecorations!(ax2, grid = <span class=hljs-literal >false</span>)
+
+ax1.xlabel = <span class=hljs-string >&quot;Weight [kg]&quot;</span>
+ax2.xlabel = <span class=hljs-string >&quot;Weight [kg]&quot;</span>
+ax1.ylabel = <span class=hljs-string >&quot;Maximum Velocity [m/sec]&quot;</span>
+
+leg = fig[<span class=hljs-number >1</span>, <span class=hljs-keyword >end</span>+<span class=hljs-number >1</span>] = Legend(fig,
+    [line1, scat1, line2, scat2],
+    [<span class=hljs-string >&quot;f(x) = x&quot;</span>, <span class=hljs-string >&quot;Data&quot;</span>, <span class=hljs-string >&quot;f(x) = -x + 26&quot;</span>, <span class=hljs-string >&quot;Data&quot;</span>])
+
+fig[<span class=hljs-number >2</span>, <span class=hljs-number >1</span>:<span class=hljs-number >2</span>] = leg
+
+trim!(fig.layout)
+
+leg.tellheight = <span class=hljs-literal >true</span>
+
+leg.orientation = :horizontal
+
+hm_axes = fig[<span class=hljs-number >1</span>:<span class=hljs-number >2</span>, <span class=hljs-number >3</span>] = [Axis(fig, title = t) <span class=hljs-keyword >for</span> t <span class=hljs-keyword >in</span> [<span class=hljs-string >&quot;Cell Assembly Pre&quot;</span>, <span class=hljs-string >&quot;Cell Assembly Post&quot;</span>]]
+
+heatmaps = [heatmap!(ax, i .+ rand(<span class=hljs-number >20</span>, <span class=hljs-number >20</span>)) <span class=hljs-keyword >for</span> (i, ax) <span class=hljs-keyword >in</span> enumerate(hm_axes)]
+
+hm_sublayout = GridLayout()
+fig[<span class=hljs-number >1</span>:<span class=hljs-number >2</span>, <span class=hljs-number >3</span>] = hm_sublayout
+
+<span class=hljs-comment ># there is another shortcut for filling a GridLayout vertically with</span>
+<span class=hljs-comment ># a vector of content</span>
+hm_sublayout[:v] = hm_axes
+
+hidedecorations!.(hm_axes)
+
+<span class=hljs-keyword >for</span> hm <span class=hljs-keyword >in</span> heatmaps
+    hm.colorrange = (<span class=hljs-number >1</span>, <span class=hljs-number >3</span>)
+<span class=hljs-keyword >end</span>
+
+cbar = hm_sublayout[:, <span class=hljs-number >2</span>] = Colorbar(fig, heatmaps[<span class=hljs-number >1</span>], label = <span class=hljs-string >&quot;Activity [spikes/sec]&quot;</span>)
+
+cbar.height = Relative(<span class=hljs-number >2</span>/<span class=hljs-number >3</span>)
+
+cbar.ticks = <span class=hljs-number >1</span>:<span class=hljs-number >0.5</span>:<span class=hljs-number >3</span>
+
+supertitle = fig[<span class=hljs-number >0</span>, :] = Label(fig, <span class=hljs-string >&quot;Complex Figures with Makie&quot;</span>,
+    textsize = <span class=hljs-number >24</span>, font = noto_sans_bold, color = (:black, <span class=hljs-number >0.25</span>))
+
+label_a = fig[<span class=hljs-number >2</span>, <span class=hljs-number >1</span>, TopLeft()] = Label(fig, <span class=hljs-string >&quot;A&quot;</span>, textsize = <span class=hljs-number >24</span>,
+    font = noto_sans_bold, halign = :right)
+label_b = fig[<span class=hljs-number >2</span>, <span class=hljs-number >3</span>, TopLeft()] = Label(fig, <span class=hljs-string >&quot;B&quot;</span>, textsize = <span class=hljs-number >24</span>,
+    font = noto_sans_bold, halign = :right)
+
+label_a.padding = (<span class=hljs-number >0</span>, <span class=hljs-number >6</span>, <span class=hljs-number >16</span>, <span class=hljs-number >0</span>)
+label_b.padding = (<span class=hljs-number >0</span>, <span class=hljs-number >6</span>, <span class=hljs-number >16</span>, <span class=hljs-number >0</span>)
+
+<span class=hljs-comment ># Aspect(1, 1) means that relative to row 1</span>
+<span class=hljs-comment ># (row because we&#x27;re setting a colsize,</span>
+<span class=hljs-comment ># and aspect ratios are always about the other side)</span>
+<span class=hljs-comment ># we set the column to an aspect ratio of 1</span>
+
+colsize!(hm_sublayout, <span class=hljs-number >1</span>, Aspect(<span class=hljs-number >1</span>, <span class=hljs-number >1</span>))
+
+save(<span class=hljs-string >&quot;layout_tutorial_final.svg&quot;</span>, fig)</code></pre> </details> <p>All right, let&#39;s get started&#33;</p> <h2 id=importing_a_backend ><a href="#importing_a_backend" class=header-anchor >Importing a backend</a></h2> <p>First, we import CairoMakie, which re-exports Makie.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> CairoMakie</code></pre>
+<p>The same works for the other backends WGLMakie and GLMakie. You can find an overview of the different backends with their capabilities in <a href="@ref">Backends &amp; Output</a>. The old MakieLayout package which you needed to install separately is deprecated, since it now lives directly in Makie. As a side note, if you do not want to make plotting code backend dependent, for example inside a package where the user should choose the backend themselves, you can depend on <code>Makie</code> alone. This allows the user to do:</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >using</span> CustomPlots <span class=hljs-comment ># depends only on Makie</span>
+<span class=hljs-keyword >using</span> GLMakie <span class=hljs-comment ># chooses GLMakie as the backend for CustomPlots</span></code></pre>
+<h2 id=creating_a_figure ><a href="#creating_a_figure" class=header-anchor >Creating a figure</a></h2>
+<p>We create an empty <code>Figure</code> which will hold all our content elements and organize them in a layout.</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >using</span> CairoMakie
+
+noto_sans = assetpath(<span class=hljs-string >&quot;fonts&quot;</span>, <span class=hljs-string >&quot;NotoSans-Regular.ttf&quot;</span>)
+noto_sans_bold = assetpath(<span class=hljs-string >&quot;fonts&quot;</span>, <span class=hljs-string >&quot;NotoSans-Bold.ttf&quot;</span>)
+
+fig = Figure(backgroundcolor = RGBf0(<span class=hljs-number >0.98</span>, <span class=hljs-number >0.98</span>, <span class=hljs-number >0.98</span>),
+    resolution = (<span class=hljs-number >1000</span>, <span class=hljs-number >700</span>), font = noto_sans)
+
+fig</code></pre></p>
+<p>
+  <a id=example_14383798262171560425 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_14383798262171560425.png" alt=""> 
+  </a>
+  
+<h2 id=first_axis ><a href="#first_axis" class=header-anchor >First axis</a></h2>
+<p>The figure is completely empty, I have made the background light gray so it&#39;s easier to see. Now we add an <code>Axis</code>.</p>
+<p>We create the axis and place it into the figure&#39;s layout in one go. You place objects in a figure by using indexing syntax. You can save the axis in a variable by chaining the <code>&#61;</code> expressions.</p>
+<p>We call the axis title &quot;Pre Treatment&quot; because we&#39;re going to plot some made up measurements, like they could result from an experimental trial.</p>
+<pre><code class="julia hljs">ax1 = fig[<span class=hljs-number >1</span>, <span class=hljs-number >1</span>] = Axis(fig, title = <span class=hljs-string >&quot;Pre Treatment&quot;</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_13515772166749576061 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_13515772166749576061.png" alt=""> 
+  </a>
+  
+<h2 id=plotting_into_an_axis ><a href="#plotting_into_an_axis" class=header-anchor >Plotting into an axis</a></h2>
+<p>We can plot into the axis with the &#33; versions of Makie&#39;s plotting functions. Such mutating function calls return the plot object that is created, which we save for later.</p>
+<pre><code class="julia hljs">data1 = randn(<span class=hljs-number >50</span>, <span class=hljs-number >2</span>) * [<span class=hljs-number >1</span> <span class=hljs-number >2.5</span>; <span class=hljs-number >2.5</span> <span class=hljs-number >1</span>] .+ [<span class=hljs-number >10</span> <span class=hljs-number >10</span>]
+
+line1 = lines!(ax1, <span class=hljs-number >5.</span><span class=hljs-number >.15</span>, x -&gt; x, color = :red, linewidth = <span class=hljs-number >2</span>)
+scat1 = scatter!(ax1, data1,
+    color = (:red, <span class=hljs-number >0.3</span>), markersize = <span class=hljs-number >15</span>px, marker = <span class=hljs-string >&#x27;■&#x27;</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_18141232894704841646 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_18141232894704841646.png" alt=""> 
+  </a>
+  
+<h2 id=multiple_axes ><a href="#multiple_axes" class=header-anchor >Multiple axes</a></h2>
+<p>This looks nice already, but we want another axis with a second dataset, to the right of the one we have. Currently our layout has one row and one cell, and only one Axis inside of it:</p>
+<pre><code class="julia hljs">fig.layout</code></pre>
+<pre><code class="plaintext hljs">GridLayout[1, 1] with 1 children
+ ┗━ [1, 1] Makie.MakieLayout.Axis
+</code></pre>
+<p>We can extend the grid with a new axis by plotting into a new grid position. Let&#39;s place a new axis with another line plot next to the one we have, in row 1 and column 2.</p>
+<p>We can use the non-mutating plotting syntax and pass a position in our figure as the first argument. When we index into a figure, we get a <code>GridPosition</code> object which describes the position we want to put our new axis in.</p>
+<p>The plotting call returns an <code>AxisPlot</code> object which we can directly destructure into axis and plot.</p>
+<pre><code class="julia hljs">ax2, line2 = lines(fig[<span class=hljs-number >1</span>, <span class=hljs-number >2</span>], <span class=hljs-number >7.</span><span class=hljs-number >.17</span>, x -&gt; -x + <span class=hljs-number >26</span>,
+    color = :blue, linewidth = <span class=hljs-number >2</span>,
+    axis = (title = <span class=hljs-string >&quot;Post Treatment&quot;</span>,))
+
+fig</code></pre></p>
+<p>
+  <a id=example_239988173108543837 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_239988173108543837.png" alt=""> 
+  </a>
+  
+<p>As you can see, the first axis has shrunk to the left to make space for the new axis on the right. We can take another look at the <code>layout</code> to see how it has changed:</p>
+<pre><code class="julia hljs">fig.layout</code></pre>
+<pre><code class="plaintext hljs">GridLayout[1, 2] with 2 children
+ ┣━ [1, 1] Makie.MakieLayout.Axis
+ ┗━ [1, 2] Makie.MakieLayout.Axis
+</code></pre>
+<p>Let&#39;s plot into the new axis, the same way we did the scatter plots before. We can also leave out the axis as the first argument if we just want to plot into the current axis.</p>
+<pre><code class="julia hljs">data2 = randn(<span class=hljs-number >50</span>, <span class=hljs-number >2</span>) * [<span class=hljs-number >1</span> -<span class=hljs-number >2.5</span>; -<span class=hljs-number >2.5</span> <span class=hljs-number >1</span>] .+ [<span class=hljs-number >13</span> <span class=hljs-number >13</span>]
+
+scat2 = scatter!(data2,
+    color = (:blue, <span class=hljs-number >0.3</span>), markersize = <span class=hljs-number >15</span>px, marker = <span class=hljs-string >&#x27;▲&#x27;</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_7183602082900448306 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_7183602082900448306.png" alt=""> 
+  </a>
+  
+<h2 id=linking_axes ><a href="#linking_axes" class=header-anchor >Linking axes</a></h2>
+<p>We want to make the left and right axes correspond to each other, so we can compare the plots more easily. To do that, we link both x and y axes. That will keep them synchronized. The function <code>linkaxes&#33;</code> links both x and y, <code>linkxaxes&#33;</code> links only x and <code>linkyaxes&#33;</code> links only y.</p>
+<pre><code class="julia hljs">linkaxes!(ax1, ax2)
+
+fig</code></pre></p>
+<p>
+  <a id=example_8356950666949137893 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_8356950666949137893.png" alt=""> 
+  </a>
+  
+<p>This looks good, but now both y-axes are the same, so we can hide the right one to make the plot less cluttered. We keep the grid lines, though. You can see that now that the y-axis is gone, the two Axes grow to fill the gap.</p>
+<pre><code class="julia hljs">hideydecorations!(ax2, grid = <span class=hljs-literal >false</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_7474094470697995786 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_7474094470697995786.png" alt=""> 
+  </a>
+  
+<p>Even though our plots are entirely made up, we should follow best practice and label the axes. We can do this with the <code>xlabel</code> and <code>ylabel</code> attributes of the <code>Axis</code>.</p>
+<pre><code class="julia hljs">ax1.xlabel = <span class=hljs-string >&quot;Weight [kg]&quot;</span>
+ax2.xlabel = <span class=hljs-string >&quot;Weight [kg]&quot;</span>
+ax1.ylabel = <span class=hljs-string >&quot;Maximum Velocity [m/sec]&quot;</span>
+
+fig</code></pre></p>
+<p>
+  <a id=example_2393523140959957007 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_2393523140959957007.png" alt=""> 
+  </a>
+  
+<h2 id=adding_a_legend ><a href="#adding_a_legend" class=header-anchor >Adding a legend</a></h2>
+<p>Let&#39;s add a legend to our figure that describes elements from both axes. We use Legend for that. Legend is a relatively complex object and there are many ways to create it, but here we&#39;ll keep it simple. We place the legend on the right again, in row 1 and column 3. Instead of specifying column three, we can also say <code>end&#43;1</code>.</p>
+<pre><code class="julia hljs">leg = fig[<span class=hljs-number >1</span>, <span class=hljs-keyword >end</span>+<span class=hljs-number >1</span>] = Legend(fig,
+    [line1, scat1, line2, scat2],
+    [<span class=hljs-string >&quot;f(x) = x&quot;</span>, <span class=hljs-string >&quot;Data&quot;</span>, <span class=hljs-string >&quot;f(x) = -x + 26&quot;</span>, <span class=hljs-string >&quot;Data&quot;</span>])
+
+fig</code></pre></p>
+<p>
+  <a id=example_17611568870423235621 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_17611568870423235621.png" alt=""> 
+  </a>
+  
+<p>You can see one nice feature of Makie here, which is that the legend takes much less horizontal space than the two axes. In fact, it takes exactly the space that it needs. This is possible because layoutable objects in Makie can tell their width or height to their parent <code>GridLayout</code>, which can then shrink the row or column appropriately.</p>
+<p>One thing that could be better about this plot, is that the legend looks like it belongs only to the right axis, even though it describes elements from both axes. So let&#39;s move it in the middle below the two. This is easily possible in Makie, without having to recreate the plot from scratch. We simply assign the legend to its new slot.</p>
+<p>We want it in the second row, and spanning the first two columns.</p>
+<pre><code class="julia hljs">fig[<span class=hljs-number >2</span>, <span class=hljs-number >1</span>:<span class=hljs-number >2</span>] = leg
+
+fig</code></pre></p>
+<p>
+  <a id=example_4966839129684206100 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_4966839129684206100.png" alt=""> 
+  </a>
+  
+<h2 id=fixing_spacing_issues ><a href="#fixing_spacing_issues" class=header-anchor >Fixing spacing issues</a></h2>
+<p>There are a couple of things wrong with this. The legend is where we want it, below the two axes. But it takes too much space vertically, and there is a large gap on the right.</p>
+<p>Let&#39;s deal with the gap on the right first. It&#39;s the hole that was left by the legend, and it&#39;s even bigger now because it gets an equal share of space with the two axes, now that there is no legend shrinking the column width to its own size.</p>
+<p>We can remove empty cells in a layout by calling <code>trim&#33;</code> on it:</p>
+<pre><code class="julia hljs">trim!(fig.layout)
+
+fig</code></pre></p>
+<p>
+  <a id=example_13433544148443984164 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_13433544148443984164.png" alt=""> 
+  </a>
+  
+<p>This is much better already&#33; But the legend still takes too much space vertically. The reason for that is the default <code>tellheight</code> setting of the legend. It&#39;s set to <code>false</code>, which essentially means that it can compute its own height, but doesn&#39;t tell the layout about it. This makes sense for the most common situation where the legend sits on the right of an axis. We wouldn&#39;t want the axis to shrink to the height of the legend. But now that the legend has its own row, we do want this behavior. So we set the <code>tellheight</code> attribute to <code>true</code>.</p>
+<pre><code class="julia hljs">leg.tellheight = <span class=hljs-literal >true</span>
+
+fig</code></pre></p>
+<p>
+  <a id=example_17487734136435045067 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_17487734136435045067.png" alt=""> 
+  </a>
+  
+<p>Now the legend&#39;s row is shrunk to fit. One thing that we can do to improve the use of space is to change the legend&#39;s orientation to <code>:horizontal</code>.</p>
+<pre><code class="julia hljs">leg.orientation = :horizontal
+
+fig</code></pre></p>
+<p>
+  <a id=example_6902508766599604623 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_6902508766599604623.png" alt=""> 
+  </a>
+  
+<h2 id=nested_layouts ><a href="#nested_layouts" class=header-anchor >Nested layouts</a></h2>
+<p>Let&#39;s add two new axes with heatmaps&#33; We want them stacked on top of each other on the right side of the figure. We&#39;ll do the naive thing first, which is to place them in the first and second row of the third column. There are multiple versions of layout assignment syntax for convenience. Here, we create and assign two axes at once. The number of cells and objects has to match to do this.</p>
+<pre><code class="julia hljs">hm_axes = fig[<span class=hljs-number >1</span>:<span class=hljs-number >2</span>, <span class=hljs-number >3</span>] = [Axis(fig, title = t) <span class=hljs-keyword >for</span> t <span class=hljs-keyword >in</span> [<span class=hljs-string >&quot;Cell Assembly Pre&quot;</span>, <span class=hljs-string >&quot;Cell Assembly Post&quot;</span>]]
+
+heatmaps = [heatmap!(ax, i .+ rand(<span class=hljs-number >20</span>, <span class=hljs-number >20</span>)) <span class=hljs-keyword >for</span> (i, ax) <span class=hljs-keyword >in</span> enumerate(hm_axes)]
+
+fig</code></pre></p>
+<p>
+  <a id=example_15525609469226347001 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_15525609469226347001.png" alt=""> 
+  </a>
+  
+<p>This looks weird, the two axes do not have the same height. Rather, the lower one has the height of the legend in the same row. What can we do to remedy this situation?</p>
+<p>We have to recognize that what we want is not possible with one layout. We don&#39;t care about the heatmap axes being the same height as the other two axes and the legend, respectively. We only care that the top and the bottom of the two groups are aligned.</p>
+<p>There is usually more than one solution for any given layout problem. In other plotting software, people sometimes circumvent our current issue by dividing the layout into many more cells than there are content objects, and have the content span several rows or columns. For example the left axes span rows 1:10, the legend 10:12, while the heatmap axes span rows 1:6 and 7:12, respectively. This is complicated, not very flexible, and luckily unnecessary in MakieLayout.</p>
+<p>We will instead help ourselves by using a nested <code>GridLayout</code>, just for the two heatmap axes. We move the axes into it by assigning them to their new slots. The detaching from the main layout happens automatically.</p>
+<pre><code class="julia hljs">hm_sublayout = GridLayout()
+fig[<span class=hljs-number >1</span>:<span class=hljs-number >2</span>, <span class=hljs-number >3</span>] = hm_sublayout
+
+<span class=hljs-comment ># there is another shortcut for filling a GridLayout vertically with</span>
+<span class=hljs-comment ># a vector of content</span>
+hm_sublayout[:v] = hm_axes
+
+fig</code></pre></p>
+<p>
+  <a id=example_6757649783118762312 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_6757649783118762312.png" alt=""> 
+  </a>
+  
+<p>We don&#39;t care about the axis decorations, as it&#39;s often the case with image plots. The function <code>hidedecorations&#33;</code> hides both x and y decorations at once.</p>
+<pre><code class="julia hljs">hidedecorations!.(hm_axes)
+
+fig</code></pre></p>
+<p>
+  <a id=example_17251884013922809856 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_17251884013922809856.png" alt=""> 
+  </a>
+  
+<h2 id=adding_a_colorbar ><a href="#adding_a_colorbar" class=header-anchor >Adding a colorbar</a></h2>
+<p>Now, we also want to add a color bar for the two heatmaps. Right now, their colors are independently scaled from each other. We choose a scale that makes sense for both of them &#40;in our case, we know data ranges only from 1 to 3&#41; and assign that to both heatmaps. Then we create a <code>Colorbar</code> object with one of the heatmaps. This way, the color bar copies color range and color map from that heatmap.</p>
+<p>We want to place the color bar to the right of the heatmaps, spanning the full height. We could either place it within the sublayout we just created, or in the main layout. Both versions can be made to look the same, but we&#39;ll choose the sublayout, because that is a more meaningful grouping, and we could move the whole assembly around later by moving only the sublayout.</p>
+<p>We can place an object along all existing rows or columns using the <code>:</code> notation.</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >for</span> hm <span class=hljs-keyword >in</span> heatmaps
+    hm.colorrange = (<span class=hljs-number >1</span>, <span class=hljs-number >3</span>)
+<span class=hljs-keyword >end</span>
+
+cbar = hm_sublayout[:, <span class=hljs-number >2</span>] = Colorbar(fig, heatmaps[<span class=hljs-number >1</span>], label = <span class=hljs-string >&quot;Activity [spikes/sec]&quot;</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_13120606009268129346 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_13120606009268129346.png" alt=""> 
+  </a>
+  
+<p>Objects can have a width or height relative to the space given to them by their parent <code>GridLayout</code>. If we feel that the colorbar is a bit too tall, we can shrink it to two thirds of the available height using <code>Relative&#40;2/3&#41;</code>.</p>
+<p>If you only specify a number like <code>30</code>, it is interpreted as <code>Fixed&#40;30&#41;</code>.</p>
+<pre><code class="julia hljs">cbar.height = Relative(<span class=hljs-number >2</span>/<span class=hljs-number >3</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_5068180219356010824 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_5068180219356010824.png" alt=""> 
+  </a>
+  
+<p>We don&#39;t really like the automatically chosen tick values here. Sometimes, the automatic algorithms just don&#39;t choose the values we want, so let&#39;s change them. We can set the <code>ticks</code> attribute to any iterable of numbers that we want.</p>
+<pre><code class="julia hljs">cbar.ticks = <span class=hljs-number >1</span>:<span class=hljs-number >0.5</span>:<span class=hljs-number >3</span>
+
+fig</code></pre></p>
+<p>
+  <a id=example_14165192074158471382 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_14165192074158471382.png" alt=""> 
+  </a>
+  
+<h2 id=adding_a_title ><a href="#adding_a_title" class=header-anchor >Adding a title</a></h2>
+<p>Now the plot could use a title&#33; While other plotting packages sometimes have functions like <code>supertitle</code>, they often don&#39;t work quite right or force you to make manual adjustments. In Makie, the <code>Label</code> object is much more flexible as it allows you to place text anywhere you want. We therefore create our super title not with a dedicated function but as a simple part of the whole layout.</p>
+<p>How can we place content in a row above row 1? This is easy in Makie, as indexing outside of the current GridLayout cells works not only with higher numbers but also with lower numbers. Therefore, we can index into the zero-th row, which will create a new row and push all other content down.</p>
+<p>Note that after this, all the cell indices of our current content will have changed to reflect the new GridLayout size.</p>
+<pre><code class="julia hljs">supertitle = fig[<span class=hljs-number >0</span>, :] = Label(fig, <span class=hljs-string >&quot;Complex Figures with Makie&quot;</span>,
+    textsize = <span class=hljs-number >24</span>, font = noto_sans_bold, color = (:black, <span class=hljs-number >0.25</span>))
+
+fig</code></pre></p>
+<p>
+  <a id=example_8567502284308674515 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_8567502284308674515.png" alt=""> 
+  </a>
+  
+<h2 id=subplot_labels ><a href="#subplot_labels" class=header-anchor >Subplot labels</a></h2>
+<p>In figures meant for publication, you often need to label subplots with letters or numbers. These can sometimes cause trouble because they overlap with other content, which has to be fixed after the fact in vector graphics software.</p>
+<p>This is not necessary in Makie. Let&#39;s place letters in the upper left corners of the left group and the right group. To do that, we will make use of a property of layouts that we have used without mentioning it. When we place our letters, we want them to act similarly to the axis titles or labels. In Makie, layoutable objects have an inner part, which is considered the &quot;important&quot; area that should align with other &quot;important&quot; inner areas. You can see that the three upper axes align with their top spines, and not their titles.</p>
+<p>All that is outside of the main area is part of the &quot;protrusions&quot;. These help keeping the logic of the layout simple while allowing to easily align what is supposed to be aligned.</p>
+<p>So for our corner letters, we don&#39;t want to create new columns or rows. Doing that would probably cause alignment issues in most cases. Instead, we place these objects <em>inside</em> the protrusions of existing cells. That means they are part of the gaps between columns and rows, which is fitting for our labels.</p>
+<p>We can do this by specifying the <code>Side</code> as a third argument when indexing the layout. The default we have used so far is <code>Inside&#40;&#41;</code>. For us, <code>TopLeft&#40;&#41;</code> is the correct choice. &#40;Remember that our previously first row is now the second row, due to the super title.&#41;</p>
+<pre><code class="julia hljs">label_a = fig[<span class=hljs-number >2</span>, <span class=hljs-number >1</span>, TopLeft()] = Label(fig, <span class=hljs-string >&quot;A&quot;</span>, textsize = <span class=hljs-number >24</span>,
+    font = noto_sans_bold, halign = :right)
+label_b = fig[<span class=hljs-number >2</span>, <span class=hljs-number >3</span>, TopLeft()] = Label(fig, <span class=hljs-string >&quot;B&quot;</span>, textsize = <span class=hljs-number >24</span>,
+    font = noto_sans_bold, halign = :right)
+
+fig</code></pre></p>
+<p>
+  <a id=example_9140680363176640346 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_9140680363176640346.png" alt=""> 
+  </a>
+  
+<p>That looks good&#33; You can see that the letters, larger than the axis titles, have increased the gap between the title and the axes to fit them. In most other plotting software, you can easily get overlap issues when you add labels like these between other elements.</p>
+<p>We still want to give the labels a bit of padding at the bottom and the right, so they are not too close to the axes. The order of the padding values is &#40;left, right, bottom, top&#41;.</p>
+<pre><code class="julia hljs">label_a.padding = (<span class=hljs-number >0</span>, <span class=hljs-number >6</span>, <span class=hljs-number >16</span>, <span class=hljs-number >0</span>)
+label_b.padding = (<span class=hljs-number >0</span>, <span class=hljs-number >6</span>, <span class=hljs-number >16</span>, <span class=hljs-number >0</span>)
+
+fig</code></pre></p>
+<p>
+  <a id=example_14186753488328133483 >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/example_14186753488328133483.png" alt=""> 
+  </a>
+  
+<h2 id=tweaking_aspect_ratios ><a href="#tweaking_aspect_ratios" class=header-anchor >Tweaking aspect ratios</a></h2>
+<p>One last thing we could improve is the shape of the heatmaps. We have square heatmaps in terms of data ratios, but they are a bit rectangular in the plot. In order to correctly make them square and have the rest of the layout adapt correctly, we don&#39;t just set the aspect ratio of each heatmap axis to 1. This would be possible, but would leave gaps where the assigned space which is still rectangular isn&#39;t used.</p>
+<p>Instead, we will tell the layout, that we want the column in which both heatmaps are should be at an aspect ratio of 1 with the first row. As both rows are at Auto size, they will both be square afterwards, and the layout will still be tight because the left two axes will grow to fill the remaining space.</p>
+<pre><code class="julia hljs"><span class=hljs-comment ># Aspect(1, 1) means that relative to row 1</span>
+<span class=hljs-comment ># (row because we&#x27;re setting a colsize,</span>
+<span class=hljs-comment ># and aspect ratios are always about the other side)</span>
+<span class=hljs-comment ># we set the column to an aspect ratio of 1</span>
+
+colsize!(hm_sublayout, <span class=hljs-number >1</span>, Aspect(<span class=hljs-number >1</span>, <span class=hljs-number >1</span>))
+
+fig</code></pre></p>
+<p>
+  <a id=layout_tutorial_final >
+   <img src="/previews/PR1181/assets/tutorials/layout-tutorial/code/output/layout_tutorial_final.png" alt=""> 
+  </a>
+  
+<p>And there we have it&#33; Hopefully this tutorial has given you an overview how to approach the creation of a complex figure in Makie. Check the rest of the documentation for more details and other dynamic parts like sliders and buttons&#33;</p>
+<div class=page-foot >
+  <div class=copyright >
+    &copy; Makie.jl. Last modified: July 30, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div>
+
+      </div> 
+    </div>   
+
+    <div class=page__footer >
+      <footer>
+        
+        
+        <div class=page__footer-follow >
+          <ul class=social-icons >
+            <li><a href="https://twitter.com/MakiePlots" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden=true ></i> Twitter</a>
+            <li><a href="https://github.com/JuliaPlots/Makie.jl" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden=true ></i> GitHub</a>
+          </ul>
+        </div>
+        <div class=page__footer-copyright >&copy; Makie.jl. Powered by <a href="https://github.com/tlienart/Franklin.jl">Franklin</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel=nofollow >Minimal Mistakes</a>.</div>
+      </footer>
+    </div>
+
+    <script src="/previews/PR1181/libs/minimal-mistakes/main.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin=anonymous ></script>
